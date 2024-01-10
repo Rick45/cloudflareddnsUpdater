@@ -1,0 +1,35 @@
+{
+    "api_key": "YOUR API KEY",
+    "domains": [
+        {
+            "domain": "domain_A.com",
+            "subdomains": [
+                {
+                    "subdomain_name": "testa.domain_A.com",
+                    "record_type": "A",
+                    "proxied": true
+                },
+                {
+                    "subdomain_name": "testb.domain_A.com",
+                    "record_type": "A",
+                    "proxied": false
+                }
+            ]
+        },
+        {
+            "domain": "domain_B.com",
+            "subdomains": [
+                {
+                    "subdomain_name": "testa.domain_B.com",
+                    "record_type": "A",
+                    "proxied": true
+                },
+                {
+                    "subdomain_name": "testb.domain_B.com",
+                    "record_type": "A",
+                    "proxied": true
+                }
+            ]
+        }
+    ]
+}
