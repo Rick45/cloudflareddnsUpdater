@@ -116,7 +116,7 @@ for domain_info in configJson["domains"]:
                 "ttl": 0
             }
             # Update the record via PUT request
-            #response = requests.put(CF_ZONE_URL + f"{zone_id}/dns_records/{record_id}", headers=headers, data=json.dumps(post_data))
+            response = requests.put(CF_ZONE_URL + f"{zone_id}/dns_records/{record_id}", headers=headers, data=json.dumps(post_data))
 
             if response.status_code == 200:
                 print('Record updated successfully')
