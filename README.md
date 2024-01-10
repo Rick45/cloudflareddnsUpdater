@@ -1,4 +1,4 @@
-# DNSUpdater
+# DNS Updater
 
 ## Description
 This Python script automates the process of updating DNS records for specific subdomains under Cloudflare. It fetches the current public IP address (both IPv4 and IPv6) and compares it with the existing IP recorded in Cloudflare. If a change is detected, it updates the DNS record accordingly.
@@ -44,3 +44,39 @@ Refer to Cloudflare's official documentation for more detailed instructions on g
 
 ## Additional Notes
 - This script currently supports A, MX, NS record types and handles both IPv4 and IPv6 addresses.
+
+
+## Dockerfile for DNSUpdater
+
+This Dockerfile sets up an environment to run the DNSUpdater script in a containerized environment. The script automates DNS record updates for specific subdomains under Cloudflare.
+
+## Instructions
+
+1. **Base Image:** Utilizes the latest Python image as the base image.
+2. **Working Directory:** Sets the working directory within the container to `/app`.
+3. **Copying Files:** Copies necessary files (`DNSUpdater.py`, `config.json`, `requirements.txt`, `crontab`) into the `/app` directory.
+4. **Installing Dependencies:** Updates `apt-get`, installs `cron`, installs Python packages from `requirements.txt`, sets permissions for the crontab file, and sets up the cron job.
+5. **Running the Script:** Executes the DNSUpdater script using Python after the setup is complete.
+6. **Default Command:** Sets the default command to keep the cron job running within the container.
+
+## Usage
+
+To build the Docker image and run the container:
+
+1. Place your `DNSUpdater.py`, `config.json`, `requirements.txt`, and `crontab` files in the same directory as this Dockerfile.
+
+2. Build the Docker image:
+
+    ```bash
+    docker build -t dnsupdater .
+    ```
+
+3. Run the Docker container:
+
+    ```bash
+    docker run -d --name dns_container dnsupdater
+    ```
+
+Ensure your `config.json` file is properly configured with the required Cloudflare API key and domain details before building the Docker image.
+
+
