@@ -5,11 +5,8 @@ import sys, time
 import logging
 from pathlib import Path
 
-
+#To use this, do logger = get_module_logger(__name__)
 def get_module_logger(mod_name):
-    """
-    To use this, do logger = get_module_logger(__name__)
-    """
     logger = logging.getLogger(mod_name)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
@@ -19,7 +16,9 @@ def get_module_logger(mod_name):
     logger.setLevel(logging.DEBUG)
     return logger
 
-get_module_logger("cloudflareddnsUpdater").info("cloudflareddnsUpdater starting")
+logger = get_module_logger("cloudflareddnsUpdater")
+
+logger.info("cloudflareddnsUpdater starting")
 
 ##Cloudflare endpoints
 CF_ZONE_URL = 'https://api.cloudflare.com/client/v4/zones/'
@@ -33,7 +32,7 @@ with open(filepath, 'r') as f:
 
 
 api_key = configJson["api_key"]
-#print("API Key to be used:", api_key)
+#logger.info("API Key to be used:", api_key)
 
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
@@ -68,14 +67,14 @@ def get_public_ipv6():
 # Iterate through domains
 for domain_info in configJson["domains"]:
     
-    print("##################################")
+    logger.info("##################################")
     domain = domain_info["domain"]
-    print(f"Domain: {domain}")
+    logger.info(f"Domain: {domain}")
 
     zone_id = get_zone_id(domain, headers)
 
     if not zone_id:
-        print(f"Zone ID for {domain} not found")
+        logger.info(f"Zone ID for {domain} not found")
         sys.exit(0)
 
     response = requests.get(CF_ZONE_URL + f"{zone_id}/dns_records", headers=headers)
@@ -89,7 +88,7 @@ for domain_info in configJson["domains"]:
             record_type = subdomains["record_type"]
             proxied = subdomains["proxied"]            
 
-            print(f"Subdomain: {subdomain}")
+            logger.info(f"Subdomain: {subdomain}")
             for record in dns_records:
                 if record['type'] == record_type.upper() and record['name'] == subdomain:
                     record_id = record['id']
@@ -104,7 +103,7 @@ for domain_info in configJson["domains"]:
                 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
             if ip == existing_IP:
-                print("Same IP no update required")
+                logger.info("Same IP no update required")
                 continue
 
             post_data = {
@@ -119,14 +118,14 @@ for domain_info in configJson["domains"]:
             response = requests.put(CF_ZONE_URL + f"{zone_id}/dns_records/{record_id}", headers=headers, data=json.dumps(post_data))
 
             if response.status_code == 200:
-                print('Record updated successfully')
+                logger.info('Record updated successfully')
             else:
-                print('Error updating record:', response.text)
+                logger.info('Error updating record:', response.text)
 
 
     else:
-        print(f"Error fetching DNS records for {domain}: {response.text}")
+        logger.info(f"Error fetching DNS records for {domain}: {response.text}")
         continue
 
 
-get_module_logger("cloudflareddnsUpdater").info("cloudflareddnsUpdater finished")
+logger.info("cloudflareddnsUpdater finished")
