@@ -2,13 +2,17 @@ import requests
 import json
 import re
 import sys, time
+import logging
+from pathlib import Path
 
 ##Cloudflare endpoints
 CF_ZONE_URL = 'https://api.cloudflare.com/client/v4/zones/'
 CF_TRACE = 'https://cloudflare.com/cdn-cgi/trace' 
 
 
-with open('config.json', 'r') as f:
+filepath = Path(__file__).parent / "config.json"
+
+with open(filepath, 'r') as f:
     configJson = json.load(f)
 
 
@@ -42,8 +46,21 @@ def get_public_ipv6():
    match = ipv6_pattern.search(response.text, re.MULTILINE)
    return match.group(1).strip()
 
+def get_module_logger(mod_name):
+    """
+    To use this, do logger = get_module_logger(__name__)
+    """
+    logger = logging.getLogger(mod_name)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    return logger
 
 
+get_module_logger("cloudflareddnsUpdater").info("cloudflareddnsUpdater starting")
 
 # Iterate through domains
 for domain_info in configJson["domains"]:
@@ -96,7 +113,7 @@ for domain_info in configJson["domains"]:
                 "ttl": 0
             }
             # Update the record via PUT request
-            response = requests.put(CF_ZONE_URL + f"{zone_id}/dns_records/{record_id}", headers=headers, data=json.dumps(post_data))
+            #response = requests.put(CF_ZONE_URL + f"{zone_id}/dns_records/{record_id}", headers=headers, data=json.dumps(post_data))
 
             if response.status_code == 200:
                 print('Record updated successfully')
@@ -107,3 +124,6 @@ for domain_info in configJson["domains"]:
     else:
         print(f"Error fetching DNS records for {domain}: {response.text}")
         continue
+
+
+get_module_logger("cloudflareddnsUpdater").info("cloudflareddnsUpdater finished")
